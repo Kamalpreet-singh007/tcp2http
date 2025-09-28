@@ -3,58 +3,33 @@ package main
 import(
 	"fmt"
 	"log"
-	"bytes"
-	"io"
+	// "bytes"
+	// "io"
 	"net"
+	"tcp/internal/requests"
 	)
 
 
-func getLineChannel(f io.ReadCloser) chan string{
-	out := make(chan string, 2)
-
-	go func(){
-		defer f.Close()
-		defer close(out)
-		line := ""
-	for {
-	 data := make([]byte, 8)
-	 n,err :=  f.Read(data)
-
-
-	 if err != nil{
-		break
-	 }
-
-	data = data[:n]
-	i :=bytes.IndexByte(data,'\n')
-	if i!=-1{
-		line += string(data[:i])
-		data = data[i+1:]
-		out <- line
-		line =""
-
-	}
-	line += string(data)
-	}
-	if(len(line) !=0){
-		out <- line
-	}
-	}()
-	return out
-}
 func main(){
 	listenr,err := net.Listen("tcp", ":42069")
 	if err != nil{
 		log.Fatal("error",err)
 	}
-	conn, err := listenr.Accept()
-	if (err != nil){
-		log.Fatal("error : ", err)
-	}
-	lines := getLineChannel(conn);
+	for {
 
-	for line :=  range(lines){
-		fmt.Println(line)
-	}
+		conn, err := listenr.Accept()
+		if (err != nil){
+			log.Fatal("error : ", err)
+		}
+		
+		
+		r,_ := request.RequestFromReader(conn)
+		
+		fmt.Printf("Request line : \n")
+		fmt.Printf("-Method: %s\n",r.RequestLine.Method )
+		fmt.Printf("-Target  : %s\n", r.RequestLine.RequestTarget)
+		fmt.Printf("-Version : %s\n", r.RequestLine.HttpVersion)
+
+	} 
 	
 }

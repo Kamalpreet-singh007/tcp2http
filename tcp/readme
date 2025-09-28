@@ -1,0 +1,3 @@
+use curl http://localhost:42069/coffee
+
+and printf "Do you have what it takes to be an engineer at TheStartup?" | nc 127.0.0.1 42069

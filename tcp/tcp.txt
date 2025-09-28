@@ -1,2 +1,4 @@
-Do you have what it takes to be an engineer at TheStartup?
- 
+Request line : 
+-Method: GET
+-Target  : /coffee
+-Version : 1.1
