@@ -1,0 +1,105 @@
+package headers
+
+import (
+	"fmt"
+	"bytes"
+	"strings"
+	
+)
+
+type Headers struct{
+
+	headers map[string]string
+} 
+
+func isToken(str string) bool{
+	 	for _, ch := range str{
+			found := false
+			if ch>= 'A' &&ch<= 'Z'||
+				ch >= 'a' && ch <= 'z'||
+				ch>= '0' && ch <= '9'{
+					found = true 
+				}
+			switch ch{
+			case '!', '#','$', '%', '&','\\', '*', '+', '-', '.','^', '_', '`', '~', '|':
+				found = true
+			}
+			if !found{
+				return false	
+			}
+		}
+		return true
+}
+
+var rn = []byte("\r\n")
+
+func NewHeaders()*Headers{
+	return &Headers{
+		headers :map[string]string{},
+	}
+}
+func parseHeaderes(feildline []byte)(string, string, error){
+	parts := bytes.SplitN(feildline, []byte(":"),2)
+	if len(parts) != 2{
+		return "", "", fmt.Errorf("malformed header")
+	}
+
+	name:= parts[0]
+	value := bytes.TrimSpace(parts[1])
+
+	if bytes.HasSuffix(name, []byte(" ")){
+		return "", "", fmt.Errorf("malformed header")
+	}
+	return string(name), string(value), nil
+}
+
+func (h *Headers) Get(name string) string{
+	return h.headers[strings.ToLower(name)]
+}
+
+func (h *Headers) Set(name ,value string) {
+
+	name = strings.ToLower(name)
+	if v, ok := h.headers[name]; ok{
+		h.headers[name] = fmt.Sprintf("%s,%s", v, value)
+		}else{
+			h.headers[name] = value
+		}
+		
+	}
+func (h*Headers)ForEach(cb func(n, v string)){
+	for n,v := range h.headers{
+		cb(n,v)
+	}
+}
+
+
+func (h *Headers) Parse(data []byte)(int,  bool,  error ){
+	read:= 0
+	done := false
+	for {
+		idx := bytes.Index(data[read:], rn)
+		if idx == -1{
+			
+			break
+		}
+
+		if idx == 0{
+			done = true 
+			break
+		}
+
+		name, value, err := parseHeaderes(data[read:read+idx])
+		if err!= nil{
+			return 0, false ,err
+		}
+		read += idx +len(rn)
+		if !isToken( name){
+			return 0, false, fmt.Errorf("malformed header name")
+		}
+
+		h.Set(name, value)
+	}
+
+	return read, done, nil
+}

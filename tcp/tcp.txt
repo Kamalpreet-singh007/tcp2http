@@ -2,3 +2,20 @@ Request line :
 -Method: GET
 -Target  : /coffee
 -Version : 1.1
+
+
+
+Headers:
+- host : localhost:42069
+- user-agent : curl/8.0
+- accept : */*
+- x-test : ParserCheck
+Request line : 
+-Method: GET
+-Target  : /coffee
+-Version : 1.1
+Headers:
+- accept : */*
+- x-test : ParserCheck
+- host : localhost:42069
+- user-agent : curl/8.0

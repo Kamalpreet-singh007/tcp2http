@@ -5,12 +5,14 @@ import(
 	"fmt"
 	"bytes"
 	"errors"
+	"tcp/internal/headers"
 )
 type parserState string
 
 const (
 	StateInit parserState = "init"
 	StateDone  parserState = "done"
+	StateHeaders  parserState = "headers"
 	StateError  parserState = "error"
 )
 
@@ -21,6 +23,7 @@ type RequestLine struct{
 }
 type Request struct{
 	RequestLine RequestLine
+	Headers *headers.Headers
 	state parserState
 	
 }
@@ -31,6 +34,7 @@ type Request struct{
 func newRequest() *Request{
 	return &Request{
 		state :StateInit,
+		Headers: headers.NewHeaders(),
 	}
 }
 var Error_Request_In_Error_State = fmt.Errorf("request in error state")
@@ -71,11 +75,12 @@ func (r* Request) parse(data []byte ) (int, error){
 		read:= 0	
 		outer:
 	for{
-
 		switch r.state {
 		case StateError:
 			return 0, Error_Request_In_Error_State
 		case StateInit:
+
+	
 			rl, n, 	err := parseRequestLine(data[read:])
 			if err!= nil {
 				r.state = StateError
@@ -87,9 +92,26 @@ func (r* Request) parse(data []byte ) (int, error){
 			r.RequestLine = *rl
 			read+=n
 
-			r.state = StateDone
+			r.state = StateHeaders
+		case StateHeaders:
+			
+			n, done, err := r.Headers.Parse(data[read:])
+
+			if err!= nil{
+				return 0,  err
+			}
+			if n == 0{
+				break outer
+			}
+			read+= n	
+			if done {
+				r.state = StateDone
+			}
+			
 		case StateDone:
 			return 0, nil
+		default:
+			panic("we did something wrong")
 		}
 	}
 	return read, nil
