@@ -53,8 +53,9 @@ func parseHeaderes(feildline []byte)(string, string, error){
 	return string(name), string(value), nil
 }
 
-func (h *Headers) Get(name string) string{
-	return h.headers[strings.ToLower(name)]
+func (h *Headers) Get(name string) (string, bool){
+	str, ok := h.headers[strings.ToLower(name)] 
+	return str,ok 
 }
 
 func (h *Headers) Set(name ,value string) {
@@ -85,6 +86,7 @@ func (h *Headers) Parse(data []byte)(int,  bool,  error ){
 		}
 
 		if idx == 0{
+			read+= len(rn)
 			done = true 
 			break
 		}

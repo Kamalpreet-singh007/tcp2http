@@ -1,21 +1,13 @@
 Request line : 
--Method: GET
+-Method: POST
 -Target  : /coffee
 -Version : 1.1
-
-
-
 Headers:
+- content-length : 38
 - host : localhost:42069
 - user-agent : curl/8.0
 - accept : */*
 - x-test : ParserCheck
-Request line : 
--Method: GET
--Target  : /coffee
--Version : 1.1
-Headers:
-- accept : */*
-- x-test : ParserCheck
-- host : localhost:42069
-- user-agent : curl/8.0
+- content-type : application/json
+Body :
+{"type": "espresso", "size": "medium"}

@@ -1,15 +1,25 @@
 to run parser
-go run . | tee tcp.txt 
+go run . | tee tcp.txt
 
 use any curl command to test
 
 example:
+
 - no headers
-    use curl http://localhost:42069/coffee
+  use curl http://localhost:42069/coffee
 
 -with headers
-    curl -v http://localhost:42069/coffee \
-    -H "Host: localhost:42069" \
-    -H "User-Agent: curl/8.0" \
-    -H "Accept: */*" \
-    -H "X-Test: ParserCheck"
+curl -v http://localhost:42069/coffee \
+ -H "Host: localhost:42069" \
+ -H "User-Agent: curl/8.0" \
+ -H "Accept: _/_" \
+ -H "X-Test: ParserCheck"
+
+- with body
+  curl -v http://localhost:42069/coffee \
+   -H "Host: localhost:42069" \
+   -H "User-Agent: curl/8.0" \
+   -H "Accept: _/_" \
+   -H "X-Test: ParserCheck" \
+   -H "Content-Type: application/json" \
+   -d '{"type": "espresso", "size": "medium"}'
