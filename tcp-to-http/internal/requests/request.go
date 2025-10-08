@@ -5,7 +5,7 @@ import(
 	"fmt"
 	"bytes"
 	// "errors"
-	"tcp/internal/headers"
+	"tcp-to-http/internal/headers"
 	"strconv"
 )
 type parserState string
